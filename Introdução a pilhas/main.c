@@ -65,6 +65,7 @@ Pessoa Desempilhar(No **topo){
     if(*topo != NULL){
         *topo = copiaTopo->proximoNo;
         conteudoTopoPilha = copiaTopo->pessoa;
+        free(copiaTopo);
         return(conteudoTopoPilha);
     } else {
         printf("\n\n<<< Pilha esta vazia! >>>\n\n");
