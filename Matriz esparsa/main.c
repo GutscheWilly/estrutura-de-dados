@@ -90,6 +90,7 @@ int acessarValor(Matriz *mat, int linha, int coluna) {
 void imprimirMatriz(Matriz *mat) {
     No *atual;
 
+    printf("---------------------------------------------\n");
     for (int i = 0 ; i < mat->linhas ; i++) {
         printf("Linha (%d) -> ", i);
         atual = mat->matriz[i];
@@ -99,18 +100,52 @@ void imprimirMatriz(Matriz *mat) {
         }
         printf("\n");
     }
+    printf("---------------------------------------------\n");
 }
-
 
 int main() {
 
+    Matriz *mat;
+    int linhas, colunas;
+    bool fimPrograma = false;
 
+    printf("Informe a quantidade de linhas da matriz: ");
+    scanf("%d", &linhas);
+    printf("Informe a quantidade de colunas da matriz: ");
+    scanf("%d", &colunas);
+    mat = inicializarMatriz(linhas, colunas);
 
-
-
-
-
-
+    while (!fimPrograma) {
+        printf("(1) - Inserir na Matriz\n");
+        printf("(2) - Remover da Matriz\n");
+        printf("(3) - Imprimir a Matriz\n");
+        printf("Digite uma das opcoes: ");
+        int opcao;
+        scanf("%d", &opcao);
+        int linha, coluna, valor;
+        switch (opcao) {
+            case 1:
+                printf("Digite a posicao da linha: ");
+                scanf("%d", &linha);
+                printf("Digite a posicao da coluna: ");
+                scanf("%d", &coluna);
+                printf("Digite o valor: ");
+                scanf("%d", &valor);
+                if (inserirMatriz(mat, linha, coluna, valor)) {
+                    printf("Inserido na matriz com sucesso!\n");
+                } else {
+                    printf("Linha ou coluna invalida!\n");
+                }
+                break;
+            case 2:
+                break;
+            case 3:
+                imprimirMatriz(mat);
+                break;
+            default:
+                printf("Opcao invalida!\n");
+        }
+    }
 
     return 0;
 }
