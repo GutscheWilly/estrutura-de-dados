@@ -87,6 +87,20 @@ int acessarValor(Matriz *mat, int linha, int coluna) {
     return 0;
 }
 
+void imprimirMatriz(Matriz *mat) {
+    No *atual;
+
+    for (int i = 0 ; i < mat->linhas ; i++) {
+        printf("Linha (%d) -> ", i);
+        atual = mat->matriz[i];
+        while (atual != NULL) {
+            printf("%d ", atual->valor);
+            atual = atual->proximo;
+        }
+        printf("\n");
+    }
+}
+
 
 int main() {
 
