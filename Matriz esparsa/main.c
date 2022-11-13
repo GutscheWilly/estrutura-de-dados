@@ -70,6 +70,22 @@ bool inserirMatriz(Matriz *mat, int linha, int coluna, int valor) {
     return true;
 }
 
+int acessarValor(Matriz *mat, int linha, int coluna) {
+    // verificando se a linha e a coluna são válidas  
+    if (linha < 0 || linha >= mat->linhas || coluna < 0 || coluna >= mat->colunas) {
+        return 0;
+    }
+
+    No *atual = mat->matriz[linha];
+    while (atual != NULL && atual->coluna < coluna) {
+        atual = atual->proximo;
+    }
+    if (atual != NULL && atual->coluna == coluna) {
+        return atual->valor;
+    }
+
+    return 0;
+}
 
 
 int main() {
