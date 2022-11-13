@@ -103,6 +103,33 @@ void imprimirMatriz(Matriz *mat) {
     printf("---------------------------------------------\n");
 }
 
+int removerElementoMatriz(Matriz *mat, int linha, int coluna) {
+    // verificando se a linha e a coluna são válidas  
+    if (linha < 0 || linha >= mat->linhas || coluna < 0 || coluna >= mat->colunas) {
+        return 0;
+    }
+
+    No *anterior = NULL;
+    No *atual = mat->matriz[linha];
+    while (atual != NULL && atual->coluna < coluna) {
+        anterior = atual;
+        atual = atual->proximo;
+    }
+
+    if (atual != NULL && atual->coluna == coluna) {
+        int valor = atual->valor;
+        if (anterior == NULL) {
+            mat->matriz[linha] = atual->proximo;
+        } else {
+            anterior->proximo = atual->proximo;
+        }
+        free(atual);
+        return valor;
+    }
+
+    return 0;
+}
+
 int main() {
 
     Matriz *mat;
@@ -134,10 +161,20 @@ int main() {
                 if (inserirMatriz(mat, linha, coluna, valor)) {
                     printf("Inserido na matriz com sucesso!\n");
                 } else {
-                    printf("Linha ou coluna invalida!\n");
+                    printf("Linha ou coluna invalidas!\n");
                 }
                 break;
             case 2:
+                printf("Digite a posicao da linha: ");
+                scanf("%d", &linha);
+                printf("Digite a posicao da coluna: ");
+                scanf("%d", &coluna);
+                valor = removerElementoMatriz(mat, linha, coluna);
+                if (valor != 0) {
+                    printf("Valor << %d >> foi removido da linha (%d) coluna (%d)\n", valor, linha, coluna);
+                } else {
+                    printf("Linha ou coluna invalidas ou a posicao possui valor nulo!\n");
+                }
                 break;
             case 3:
                 imprimirMatriz(mat);
