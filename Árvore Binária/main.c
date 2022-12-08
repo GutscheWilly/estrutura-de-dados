@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "ArvBinaria.h"
 
 int imprimirOpcao() {
@@ -25,10 +24,12 @@ int main() {
 
     ArvBinaria *raiz = NULL;
     int fimPrograma = 0;
-    int array[] = {583, 245, 731, 123, 389, 278, 684, 893};
     int valor;
+    int array[] = {583, 245, 731, 123, 389, 200, 278, 684, 893};
 
-    for (int i = 0 ; i < 8 ; i++) {
+    //Por conveniência iniciei a árvore com todos os valores do Array
+
+    for (int i = 0 ; i < 9 ; i++) {
         inserirValor(&raiz, array[i]);
     }
     
@@ -40,6 +41,8 @@ int main() {
             case 2:
                 printf("Arvore: ");
                 imprimirArvBinaria(raiz);
+                printf("\n\nValores ordenados: ");
+                imprimirArvBinariaOrdenada(raiz);
                 printf("\n");
                 break;
             case 3:

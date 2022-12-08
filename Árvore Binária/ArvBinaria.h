@@ -9,6 +9,7 @@ typedef struct ArvBinaria {
 
 void inserirValor(ArvBinaria **raiz, int valor);
 void imprimirArvBinaria(ArvBinaria *raiz);
+void imprimirArvBinariaOrdenada(ArvBinaria *raiz);
 ArvBinaria* buscarValor(ArvBinaria *raiz, int valor);
 ArvBinaria* removerValor(ArvBinaria *raiz, int valor);
 
