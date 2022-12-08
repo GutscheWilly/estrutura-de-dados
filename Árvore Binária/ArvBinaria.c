@@ -51,16 +51,13 @@ ArvBinaria* removerValor(ArvBinaria *raiz, int valor) {
     if (valor == raiz->valor) {
         if (raiz->esquerda != NULL && raiz->direita != NULL) {
             ArvBinaria *auxiliar = raiz->esquerda;
-            while (auxiliar->esquerda != NULL || auxiliar->direita != NULL) {
-                if (auxiliar->esquerda != NULL) {
-                    auxiliar = auxiliar->esquerda;
-                } else {
-                    auxiliar = auxiliar->direita;
-                }
+            while (auxiliar->direita != NULL) {
+                auxiliar = auxiliar->direita;
             }
             raiz->valor = auxiliar->valor;
             auxiliar->valor = valor;
-            return removerValor(raiz, valor);
+            raiz->esquerda = removerValor(raiz->esquerda, valor);
+            return raiz;
         }
         if (raiz->esquerda == NULL && raiz->direita == NULL) {
             free(raiz);
