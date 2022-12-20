@@ -83,7 +83,7 @@ int main() {
     ArvBinaria *raiz = NULL;
     char string[20];
 
-    while (1) {
+    while (!feof(stdin)) {
         fflush(stdin);
         fgets(string, 20, stdin);
         string[strlen(string) - 1] = '\0';

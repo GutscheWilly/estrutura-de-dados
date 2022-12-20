@@ -27,7 +27,7 @@ ArvBinaria* inserirLetra(ArvBinaria *raiz, char letra) {
 
 void imprimirArvorePreOrdem(ArvBinaria *raiz) {
     if (raiz) {
-        printf(" %d", raiz->letra);
+        printf(" %c", raiz->letra);
         imprimirArvorePreOrdem(raiz->esquerda);
         imprimirArvorePreOrdem(raiz->direita);
     }
@@ -36,7 +36,7 @@ void imprimirArvorePreOrdem(ArvBinaria *raiz) {
 void imprimirArvoreEmOrdem(ArvBinaria *raiz) {
     if (raiz) {
         imprimirArvoreEmOrdem(raiz->esquerda);
-        printf(" %d", raiz->letra);
+        printf(" %c", raiz->letra);
         imprimirArvoreEmOrdem(raiz->direita);
     }
 }
@@ -45,7 +45,7 @@ void imprimirArvorePosOrdem(ArvBinaria *raiz) {
     if (raiz) {
         imprimirArvorePosOrdem(raiz->esquerda);
         imprimirArvorePosOrdem(raiz->direita);
-        printf(" %d", raiz->letra);
+        printf(" %c", raiz->letra);
     }
 }
 
@@ -58,19 +58,30 @@ void imprimirArvorePosOrdem(ArvBinaria *raiz) {
 
 int main() {
 
-    ArvBinaria *raiz;
-    char string1[53], string2[53];
+    ArvBinaria *raiz = NULL;
+    char formaPrefixa[53], formaInfixa[53];
     int quantTestes, quantNodos;
+    char teste[] = {'A', 'B', 'C', 'D', 'E', 'F'};
 
     scanf("%d", &quantTestes);
 
-    for (int i = 1 ; i < quantTestes ; i++) {
+    /*
+    for (int i = 1 ; i <= quantTestes ; i++) {
         scanf("%d", &quantNodos);
+        scanf("%s", formaPrefixa);
+        scanf("%s", formaInfixa);
+    }
+    */
 
-        
+    for(int i = 0 ; i < 6 ; i++) {
+        raiz = inserirLetra(raiz, teste[i]);
     }
 
-
+    imprimirArvorePreOrdem(raiz);
+    printf("\n");
+    imprimirArvoreEmOrdem(raiz);
+    printf("\n");
+    imprimirArvorePosOrdem(raiz);
 
     return 0;
 }
