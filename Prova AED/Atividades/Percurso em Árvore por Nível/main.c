@@ -1,100 +1,105 @@
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-typedef struct no{
+typedef struct No{
     int valor; 
-    struct no* esq;
-    struct no* dir;
-}NO;
+    struct No* esquerda;
+    struct No* direita;
+}No;
 
-typedef struct arvore{
-    NO* pont;
-}ARVORE;
+typedef struct ArvBinaria{
+    No* raiz;
+}ArvBinaria;
 
-typedef struct elemento{
-    NO* reg;
-    struct elemento* prox;
-}ELEMENTO;
+typedef struct Elemento{
+    No* raiz;
+    struct Elemento* proximo;
+}Elemento;
 
-typedef struct fila{
-    ELEMENTO* head;
-}FILA;
+typedef struct Fila{
+    Elemento* inicio;
+}Fila;
 
-NO* inserirValor(NO *raiz, int valor) {
+No* inserirValor(No *raiz, int valor) {
     if (raiz == NULL) {
-        NO *auxiliar = (NO*)malloc(sizeof(NO));
+        No *auxiliar = (No*)malloc(sizeof(No));
         auxiliar->valor = valor;
-        auxiliar->esq = NULL;
-        auxiliar->dir = NULL;
+        auxiliar->esquerda = NULL;
+        auxiliar->direita = NULL;
         return auxiliar;
     } else if (valor < raiz->valor) {
-        raiz->esq = inserirValor(raiz->esq, valor);
+        raiz->esquerda = inserirValor(raiz->esquerda, valor);
     } else {
-        raiz->dir = inserirValor(raiz->dir, valor);
+        raiz->direita = inserirValor(raiz->direita, valor);
     }
     return raiz;
 }
 
-void criaFila(FILA* fila){
-    fila->head = NULL;
+void criaFila(Fila* fila){
+    fila->inicio = NULL;
 } 
 
-void insereFila(FILA* fila, NO* p){
-    ELEMENTO* novo = (ELEMENTO *) malloc(sizeof(ELEMENTO));
-    novo->reg = p;
-    novo->prox = NULL;
-    if(fila->head==NULL){
-        fila->head = novo;
-    }else{
-        ELEMENTO* pointer = fila->head;
-        ELEMENTO* ant = NULL;
-        while(pointer!=NULL){
-            ant = pointer;
-            pointer = pointer->prox;
+void insereFila(Fila *fila, No *raiz){
+    Elemento *novo = (Elemento*)malloc(sizeof(Elemento));
+    novo->raiz = raiz;
+    novo->proximo = NULL;
+    if (fila->inicio == NULL) {
+        fila->inicio = novo;
+    } else {
+        Elemento *anterior = NULL;
+        Elemento *auxiliar = fila->inicio;
+        while (auxiliar != NULL) {
+            anterior = auxiliar;
+            auxiliar = auxiliar->proximo;
         }
-        ant->prox = novo;
-        free(pointer);
+        anterior->proximo = novo;
+        free(auxiliar);
     }
 }
 
-NO* removeFila(FILA* fila){
-    if(fila->head!=NULL){
-        ELEMENTO* pointer = fila->head;
-        fila->head = pointer->prox;
-        return pointer->reg;
+No* removeFila(Fila* fila){
+    if (fila->inicio != NULL) {
+        Elemento *auxiliar = fila->inicio;
+        fila->inicio = auxiliar->proximo;
+        return auxiliar->raiz;
     }
+    return NULL;
 }
 
-int tamanhoFila(FILA* fila){
-    ELEMENTO* pointer = fila->head;
-    int tam;
-    tam=0;
-    while(pointer!=NULL){
-        tam++;
-        pointer = pointer->prox;
+int tamanhoFila(Fila *fila){
+    Elemento *auxiliar = fila->inicio;
+    int tamanho = 0;
+
+    while (auxiliar != NULL) {
+        tamanho++;
+        auxiliar = auxiliar->proximo;
     }
-    return tam;
+    return tamanho;
 }
-void percursoPorNivel(NO* raiz){
-    FILA fila;   
-    NO* prox;
+
+void percursoPorNivel(No *raiz){
+    Fila fila;   
+    No *proximo;
+
     criaFila(&fila);
     insereFila(&fila, raiz);
-    while(tamanhoFila(&fila)>0){
-        prox = removeFila(&fila);
-        printf("%d ", prox->valor);
-        if(prox->esq!=NULL){
-            insereFila(&fila, prox->esq);
+
+    while (tamanhoFila(&fila) > 0) {
+        proximo = removeFila(&fila);
+        printf("%d ", proximo->valor);
+
+        if (proximo->esquerda != NULL) {
+            insereFila(&fila, proximo->esquerda);
         }
-        if(prox->dir!=NULL){
-            insereFila(&fila, prox->dir);
+        if (proximo->direita != NULL) {
+            insereFila(&fila, proximo->direita);
         }
     }
 }
 
 int main() {
 
-    NO *raiz = NULL;
+    No *raiz = NULL;
     int quantTestes, quantValores, valor;
 
     scanf("%d", &quantTestes);
@@ -107,6 +112,7 @@ int main() {
             scanf("%d", &valor);
             raiz = inserirValor(raiz, valor);
         }
+
         printf("Case %d:\n", i);
         percursoPorNivel(raiz);
         printf("\n\n");
