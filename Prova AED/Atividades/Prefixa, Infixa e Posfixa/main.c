@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+int contadorPrefixa;
 
 typedef struct ArvBinaria {
     char letra;
@@ -7,81 +10,77 @@ typedef struct ArvBinaria {
     struct ArvBinaria *direita;
 }ArvBinaria;
 
-ArvBinaria* inserirLetra(ArvBinaria *raiz, char letra) {
-    if (raiz == NULL) {
-        ArvBinaria *novoNo = (ArvBinaria*)malloc(sizeof(ArvBinaria));
-        novoNo->letra = letra;
-        novoNo->esquerda = NULL;
-        novoNo->direita = NULL;
-        return novoNo;
+ArvBinaria* inicializaRaiz(char letra) {
+    ArvBinaria *novaRaiz = (ArvBinaria*)malloc(sizeof(ArvBinaria));
+    novaRaiz->letra = letra;
+    novaRaiz->esquerda = NULL;
+    novaRaiz->direita = NULL;
+    return novaRaiz;
+}
+
+ArvBinaria* montarArvBinaria(ArvBinaria *raiz, char prefixa[], char infixa[], int indexEsquerda, int indexDireita) {
+    int i = 0;
+
+    while (infixa[i] != prefixa[contadorPrefixa]) {
+        i++;
     }
 
-    if (letra < raiz->letra) {
-        raiz->esquerda = inserirLetra(raiz->esquerda, letra);
-    } else {
-        raiz->direita = inserirLetra(raiz->direita, letra);
+    contadorPrefixa++;
+    
+    if (indexEsquerda <= indexDireita && contadorPrefixa <= strlen(infixa)) {
+        raiz = inicializaRaiz(infixa[i]);
+
+        if (i > indexEsquerda) {
+            raiz->esquerda = montarArvBinaria(raiz->esquerda, prefixa, infixa, indexEsquerda, i - 1);
+        }
+
+        if (i < indexDireita) {
+            raiz->direita = montarArvBinaria(raiz->direita, prefixa, infixa, i + 1, indexDireita);
+        }
     }
 
     return raiz;
 }
 
-void imprimirArvorePreOrdem(ArvBinaria *raiz) {
+void imprimirPosFixa(ArvBinaria *raiz) {
     if (raiz) {
-        printf(" %c", raiz->letra);
-        imprimirArvorePreOrdem(raiz->esquerda);
-        imprimirArvorePreOrdem(raiz->direita);
+        imprimirPosFixa(raiz->esquerda);
+        imprimirPosFixa(raiz->direita);
+        printf("%c", raiz->letra);
     }
 }
-
-void imprimirArvoreEmOrdem(ArvBinaria *raiz) {
-    if (raiz) {
-        imprimirArvoreEmOrdem(raiz->esquerda);
-        printf(" %c", raiz->letra);
-        imprimirArvoreEmOrdem(raiz->direita);
-    }
-}
-
-void imprimirArvorePosOrdem(ArvBinaria *raiz) {
-    if (raiz) {
-        imprimirArvorePosOrdem(raiz->esquerda);
-        imprimirArvorePosOrdem(raiz->direita);
-        printf(" %c", raiz->letra);
-    }
-}
-
-
-
-
-
-
-
 
 int main() {
 
-    ArvBinaria *raiz = NULL;
-    char formaPrefixa[53], formaInfixa[53];
+    char preFixa[20], inFixa[20], string[40];
+    char *tokenString;
+    ArvBinaria *raiz;
     int quantTestes, quantNodos;
-    char teste[] = {'A', 'B', 'C', 'D', 'E', 'F'};
 
     scanf("%d", &quantTestes);
 
-    /*
-    for (int i = 1 ; i <= quantTestes ; i++) {
-        scanf("%d", &quantNodos);
-        scanf("%s", formaPrefixa);
-        scanf("%s", formaInfixa);
-    }
-    */
+    for (int i = 0 ; i < quantTestes ; i++) {
+        raiz = NULL;
+        fflush(stdin);
+        scanf("%d\n", &quantNodos);
+        gets(string);
+        
+        tokenString = strtok(string, " ");
 
-    for(int i = 0 ; i < 6 ; i++) {
-        raiz = inserirLetra(raiz, teste[i]);
-    }
+        for (int j = 1 ; j < 3 ; j++) {
+            if (j == 1) {
+                strcpy(preFixa, tokenString);
+            } else {
+                strcpy(inFixa, tokenString);
+            }
+            tokenString = strtok(NULL, " ");
+        }
 
-    imprimirArvorePreOrdem(raiz);
-    printf("\n");
-    imprimirArvoreEmOrdem(raiz);
-    printf("\n");
-    imprimirArvorePosOrdem(raiz);
+        contadorPrefixa = 0;
+        raiz = montarArvBinaria(raiz, preFixa, inFixa, 0, strlen(preFixa) - 1);
+        imprimirPosFixa(raiz);
+        printf("\n");
+    }
 
     return 0;
 }
