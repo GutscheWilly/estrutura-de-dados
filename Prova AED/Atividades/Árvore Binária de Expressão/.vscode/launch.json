@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/willy/OneDrive/Área de Trabalho/Estrutura-de-Dados/Prova AED/Atividades/Árvore Binária de Expressão",
-      "program": "c:/Users/willy/OneDrive/Área de Trabalho/Estrutura-de-Dados/Prova AED/Atividades/Árvore Binária de Expressão/build/Debug/outDebug",
+      "cwd": "c:/Users/willy/OneDrive/Área de Trabalho/estrutura-de-dados/Prova AED/Atividades/Árvore Binária de Expressão",
+      "program": "c:/Users/willy/OneDrive/Área de Trabalho/estrutura-de-dados/Prova AED/Atividades/Árvore Binária de Expressão/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
