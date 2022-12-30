@@ -38,22 +38,35 @@ void adicionarParentesesNaString(char string[]) {
             if (string[i - 1] != ')') {
                 adicionarCaracterNaString(string, i - 1, '(');
             } else {
-                int j = i - 2;
-                // ideia estranha de igualar a quantidade de parenteses a serem fechados (    )))
-                while (string[j] != '(') {
+                int j = i - 1;
+                int parenteses = 1;
+                for (int e = 0 ; e < parenteses ; e++) {
                     j--;
+                    while (string[j] != '(') {
+                        if (string[j] == ')') {
+                            parenteses++;
+                        }
+                        j--;
+                    }
                 }
                 adicionarCaracterNaString(string, j, '(');
             }
 
             i++;
 
-            if (string[i + 2] != '(') {
+            if (string[i + 1] != '(') {
                 adicionarCaracterNaString(string, i + 2, ')');
             } else {
                 int j = i + 1;
-                while (string[j] != ')') {
+                int parenteses = 1;
+                for (int e = 0 ; e < parenteses ; e++) {
                     j++;
+                    while (string[j] != ')') {
+                        if (string[j] == '(') {
+                            parenteses++;
+                        }
+                        j++;
+                    }
                 }
                 adicionarCaracterNaString(string, j, ')');
             }
