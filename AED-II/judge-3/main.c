@@ -8,12 +8,14 @@ typedef struct Node {
 
 typedef struct {
     Node* start;
+    Node* end;
     int size;
 } List;
 
 List* newList() {
     List* list = (List*) malloc(sizeof(List));
     list->start = NULL;
+    list->end = NULL;
     list->size = 0;
     return list;
 }
@@ -30,18 +32,12 @@ void addNode(List* list, int value) {
 
     if (list->start == NULL) {
         list->start = newNode(value);
+        list->end = list->start;
         return;
     }
 
-    Node* lastNode = NULL;
-    Node* auxiliaryNode = list->start;
-
-    while (auxiliaryNode != NULL) {
-        lastNode = auxiliaryNode;
-        auxiliaryNode = auxiliaryNode->next;
-    }
-
-    lastNode->next = newNode(value);
+    list->end->next = newNode(value);
+    list->end = list->end->next;
 }
 
 int inputValue() {
@@ -101,6 +97,10 @@ void removeStartOfList(List* list) {
     list->start = start->next;
     list->size--;
     free(start);
+
+    if (list->size == 0) {
+        list->end = NULL;
+    }
 }
 
 void merge(List* list, int beginIndex, int middleIndex, int endIndex) {
