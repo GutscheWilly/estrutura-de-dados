@@ -1,88 +1,168 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct Node {
+    int value;
+    struct Node* next;
+} Node;
+
+typedef struct {
+    Node* start;
+    int size;
+} List;
+
+List* newList() {
+    List* list = (List*) malloc(sizeof(List));
+    list->start = NULL;
+    list->size = 0;
+    return list;
+}
+
+Node* newNode(int value) {
+    Node* node = (Node*) malloc(sizeof(Node));
+    node->value = value;
+    node->next = NULL;
+    return node;
+}
+
+void addNode(List* list, int value) {
+    list->size++;
+
+    if (list->start == NULL) {
+        list->start = newNode(value);
+        return;
+    }
+
+    Node* lastNode = NULL;
+    Node* auxiliaryNode = list->start;
+
+    while (auxiliaryNode != NULL) {
+        lastNode = auxiliaryNode;
+        auxiliaryNode = auxiliaryNode->next;
+    }
+
+    lastNode->next = newNode(value);
+}
+
 int inputValue() {
     int value;
     scanf("%d", &value);
     return value;
 }
 
-int* inputArray(int size) {
-    int* array = (int*) malloc(size * sizeof(int));
+List* inputValuesList(int size) {
+    List* list = newList();
 
     for (int i = 0; i < size; i++) {
-        scanf("%d", &array[i]);
+        int value = inputValue();
+        addNode(list, value);
     }
-    return array;
+    return list;
 }
 
-int* splitArray(int* array, int size, int begin) {
-    int* splitArray = (int*) malloc(size * sizeof(int));
+void printList(List list) {
+    Node* currentNode = list.start;
 
-    for (int i = 0; i < size; i++) {
-        splitArray[i] = array[begin + i];
+    for (int i = 0; i < list.size; i++) {
+        int value = currentNode->value;
+        printf("%d ", value);
+        currentNode = currentNode->next;
     }
-    return splitArray;
 }
 
-void merge(int* array, int begin, int middle, int end) {
-    int leftSize = middle - begin + 1;
-    int rightSize = end - middle;
+Node* getNodeByIndex(List* list, int index) {
+    if (index < 0 || index > list->size - 1) {
+        return NULL;
+    }
 
-    int* leftArray = splitArray(array, leftSize, begin);
-    int* rightArray = splitArray(array, rightSize, middle + 1);
+    Node* node = list->start;
 
-    int leftIndex = 0;
-    int rightIndex = 0;
+    for (int i = 0; i < index; i++) {
+        node = node->next;
+    }   
+    return node;
+}
 
-    for (int i = begin; i <= end; i++) {
-        if (leftIndex >= leftSize) {
-            array[i] = rightArray[rightIndex];
-            rightIndex++;
+List* splitList(List* list, int startIndex, int endIndex) {
+    List* splitList = newList();
+
+    Node* auxiliaryNode = getNodeByIndex(list, startIndex);
+
+    for (int i = startIndex; i <= endIndex; i++) {
+        int value = auxiliaryNode->value;
+        addNode(splitList, value);
+        auxiliaryNode = auxiliaryNode->next;
+    }
+    return splitList;
+}
+
+void removeStartOfList(List* list) {
+    Node* start = list->start;
+    list->start = start->next;
+    list->size--;
+    free(start);
+}
+
+void merge(List* list, int beginIndex, int middleIndex, int endIndex) {
+    List* leftList = splitList(list, beginIndex, middleIndex);
+    List* rightList = splitList(list, middleIndex + 1, endIndex);
+
+    Node* currentNode = getNodeByIndex(list, beginIndex);
+
+    for (int i = beginIndex; i <= endIndex; i++) {
+        if (leftList->size == 0) {
+            currentNode->value = rightList->start->value;
+            currentNode = currentNode->next;
+            removeStartOfList(rightList);
             continue;
         }
 
-        if (rightIndex >= rightSize) {
-            array[i] = leftArray[leftIndex];
-            leftIndex++;
+        if (rightList->size == 0) {
+            currentNode->value = leftList->start->value;
+            currentNode = currentNode->next;
+            removeStartOfList(leftList);
             continue;
         }
 
-        if (leftArray[leftIndex] <= rightArray[rightIndex]) {
-            array[i] = leftArray[leftIndex];
-            leftIndex++;
-        } else {
-            array[i] = rightArray[rightIndex];
-            rightIndex++;
+        int leftValue = leftList->start->value;
+        int rightValue = rightList->start->value;
+
+        if (leftValue <= rightValue) {
+            currentNode->value = leftValue;
+            removeStartOfList(leftList);
         }
+
+        if (rightValue < leftValue) {
+            currentNode->value = rightValue;
+            removeStartOfList(rightList);
+        }
+
+        currentNode = currentNode->next;
     }
+
+    free(leftList);
+    free(rightList);
 }
 
-void mergeSort(int* array, int begin, int end) {
-    if (begin < end) {
-        int middle = (begin + end) / 2;
+void mergeSort(List* list, int beginIndex, int endIndex) {
+    if (beginIndex < endIndex) {
+        int middleIndex = (beginIndex + endIndex) / 2;
 
-        mergeSort(array, begin, middle);
-        mergeSort(array, middle + 1, end);
+        mergeSort(list, beginIndex, middleIndex);
+        mergeSort(list, middleIndex + 1, endIndex);
 
-        merge(array, begin, middle, end);
-    }
-}
-
-void printArray(int* array, int size) {
-    for (int i = 0; i < size; i++) {
-        printf("%d ", array[i]);
+        merge(list, beginIndex, middleIndex, endIndex);
     }
 }
 
 int main() {
-    int quantityValue = inputValue();
-    
-    int* values = inputArray(quantityValue); 
+    int size = inputValue();
 
-    mergeSort(values, 0, quantityValue - 1);
+    List* list = inputValuesList(size);
 
-    printArray(values, quantityValue);
+    mergeSort(list, 0, list->size - 1);
+
+    printList(*list);
 
     return 0;
 }
