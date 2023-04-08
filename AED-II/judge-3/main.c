@@ -144,25 +144,54 @@ void merge(List* list, int beginIndex, int middleIndex, int endIndex) {
     free(rightList);
 }
 
-void mergeSort(List* list, int beginIndex, int endIndex) {
+void mergeSort(List* list, int beginIndex, int endIndex, int* leftDepth, int* rightDepth) {
     if (beginIndex < endIndex) {
         int middleIndex = (beginIndex + endIndex) / 2;
 
-        mergeSort(list, beginIndex, middleIndex);
-        mergeSort(list, middleIndex + 1, endIndex);
+        if (leftDepth) {
+            *leftDepth += 1;
+        }
+
+        if (rightDepth) {
+            *rightDepth += 1;
+        }
+
+        mergeSort(list, beginIndex, middleIndex, leftDepth, NULL);
+        mergeSort(list, middleIndex + 1, endIndex, NULL, rightDepth);
 
         merge(list, beginIndex, middleIndex, endIndex);
     }
 }
 
+int maxDepth(int leftDepth, int rightDepth) {
+    if (leftDepth >= rightDepth) {
+        return leftDepth;
+    }
+    return rightDepth;
+}
+
+void freeList(List* list) {
+    while (list->size > 0) {
+        removeStartOfList(list);
+    }
+    free(list);
+}
+
 int main() {
     int size = inputValue();
-
     List* list = inputValuesList(size);
 
-    mergeSort(list, 0, list->size - 1);
+    int leftDepth = 0;
+    int rightDepth = 0;
+
+    mergeSort(list, 0, list->size - 1, &leftDepth, &rightDepth);
+
+    int depth = maxDepth(leftDepth, rightDepth);
 
     printList(*list);
+    printf("\n%d", depth);
+
+    freeList(list);
 
     return 0;
 }
