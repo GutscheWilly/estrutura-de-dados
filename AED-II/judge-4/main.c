@@ -42,7 +42,7 @@ int partition(int* array, int startIndex, int endIndex) {
     for (int currentIndex = startIndex; currentIndex < endIndex; currentIndex++) {
         int currentValue = array[currentIndex];
 
-        if (currentValue < pivotValue) {
+        if (currentValue <= pivotValue) {
             swap(array, referenceIndex, currentIndex);
             referenceIndex++;
         }
