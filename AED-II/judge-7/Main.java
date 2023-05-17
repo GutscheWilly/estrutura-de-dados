@@ -3,14 +3,14 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        List<Integer> keys = Arrays.asList(15, 27, 49, 10, 8, 67, 59, 9, 13, 20, 14);
+        List<Integer> keys = Arrays.asList(6, 4, 3, 2, 1);
         AVLTree avlTree = new AVLTree(keys);
         avlTree.printTree();
     }
 }
 
 class Node {
-    private Integer key;
+    private final Integer key;
     private Node leftNode;
     private Node rigthNode;
     private Integer height;
@@ -34,15 +34,18 @@ class Node {
         return rigthNode;
     }
 
-    private static Integer getHeight(Node node) {
+    public static Integer getHeight(Node node) {
         if (node == null) {
             return -1;
         }
         return node.height;
     }
 
-    public void setKey(Integer key) {
-        this.key = key;
+    public static Integer getBalance(Node node) {
+        if (node == null) {
+            return 0;
+        }
+        return getHeight(node.getLeftNode()) - getHeight(node.getRigthNode());
     }
 
     public void setLeftNode(Node node) {
@@ -62,13 +65,6 @@ class Node {
             return;
         }
         this.height = rightHeight + 1;
-    }
-
-    public static Integer getBalance(Node node) {
-        if (node == null) {
-            return 0;
-        }
-        return getHeight(node.getLeftNode()) - getHeight(node.getRigthNode());
     }
 }
 
@@ -107,18 +103,26 @@ class AVLTree {
 
     private Node leftRotate(Node node) {
         final Node auxiliaryNode = node.getRigthNode();
+        final Node auxiliaryLeft = auxiliaryNode.getLeftNode();
 
-        node.setRightNode(auxiliaryNode.getLeftNode());
+        node.setRightNode(auxiliaryLeft);
         auxiliaryNode.setLeftNode(node);
+
+        node.setHeight();
+        auxiliaryNode.setHeight();
 
         return auxiliaryNode;
     }
 
     private Node rightRotate(Node node) {
         final Node auxiliaryNode = node.getLeftNode();
+        final Node auxiliaryRight = auxiliaryNode.getRigthNode();
 
-        node.setLeftNode(auxiliaryNode.getRigthNode());
+        node.setLeftNode(auxiliaryRight);
         auxiliaryNode.setRightNode(node);
+
+        node.setHeight();
+        auxiliaryNode.setHeight();
 
         return auxiliaryNode;
     }
@@ -134,9 +138,9 @@ class AVLTree {
     }
 
     private Node balanceNode(Node node) {
-        final Integer nodeBalance = Node.getBalance(node);
-        final Integer leftBalance = Node.getBalance(node.getLeftNode());
-        final Integer rightBalance = Node.getBalance(node.getRigthNode());
+        final int nodeBalance = Node.getBalance(node);
+        final int leftBalance = Node.getBalance(node.getLeftNode());
+        final int rightBalance = Node.getBalance(node.getRigthNode());
 
         if (nodeBalance < -1 && rightBalance <= 0) {
             return leftRotate(node);
@@ -159,8 +163,8 @@ class AVLTree {
 
     private void printNode(Node node) {
         if (node != null) {
+            System.out.print(node.getKey() + "(" + Node.getHeight(node) + ") ");
             printNode(node.getLeftNode());
-            System.out.print(node.getKey() + " ");
             printNode(node.getRigthNode());
         }
     }
