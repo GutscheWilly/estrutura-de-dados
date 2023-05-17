@@ -13,13 +13,13 @@ class Node {
     private Integer key;
     private Node leftNode;
     private Node rigthNode;
-    private Integer balance;
+    private Integer height;
 
     public Node(Integer key) {
         this.key = key;
         this.leftNode = null;
         this.rigthNode = null;
-        this.balance = 0;
+        this.height = 0;
     }
 
     public Integer getKey() {
@@ -34,8 +34,11 @@ class Node {
         return rigthNode;
     }
 
-    public Integer getBalance() {
-        return balance;
+    private static Integer getHeight(Node node) {
+        if (node == null) {
+            return -1;
+        }
+        return node.height;
     }
 
     public void setKey(Integer key) {
@@ -50,8 +53,22 @@ class Node {
         rigthNode = node;
     }
 
-    public void setBalance(Integer balance) {
-        this.balance = balance;
+    public void setHeight() {
+        final Integer leftHeight = getHeight(leftNode);
+        final Integer rightHeight = getHeight(rigthNode);
+
+        if (leftHeight >= rightHeight) {
+            this.height = leftHeight + 1;
+            return;
+        }
+        this.height = rightHeight + 1;
+    }
+
+    public static Integer getBalance(Node node) {
+        if (node == null) {
+            return 0;
+        }
+        return getHeight(node.getLeftNode()) - getHeight(node.getRigthNode());
     }
 }
 
@@ -67,108 +84,25 @@ class AVLTree {
     }
 
     private void createAVLTree(List<Integer> keys) {
-        final Height height = new Height();
-
         keys.forEach( key -> {
-            final Node newNode = addNode(key, firstNode, height);
-            setFirstNode(newNode);
+            final Node firstNodeAdded = addNode(key, firstNode);
+            setFirstNode(firstNodeAdded);
         });
     }
 
-    private Node addNode(Integer key, Node referenceNode, Height height) {
+    private Node addNode(Integer key, Node referenceNode) {
         if (referenceNode == null) {
-            height.setIncreaseHeight(true);
             return new Node(key);
         }
 
-        final Integer referenceKey = referenceNode.getKey();
-
-        if (key <= referenceKey) {
-            referenceNode.setLeftNode(addNode(key, referenceNode.getLeftNode(), height));
-
-            if (height.getIncreaseHeight()) {
-                switch (referenceNode.getBalance()) {
-                    case 1 -> {
-                        referenceNode.setBalance(0);
-                        height.setIncreaseHeight(false);
-                    }
-                    case 0 -> {
-                        referenceNode.setBalance(-1);
-                        height.setIncreaseHeight(true);
-                    }
-                    case -1 -> {
-                        final Integer leftBalance = referenceNode.getLeftNode().getBalance();
-                        if (leftBalance == -1) {
-                            referenceNode = rightRotate(referenceNode);
-                            final Node rightNode = referenceNode.getRigthNode();
-                            rightNode.setBalance(0);
-                        } else {
-                            referenceNode.setLeftNode(leftRotate(referenceNode.getLeftNode()));
-                            referenceNode = rightRotate(referenceNode);
-
-                            final Integer referenceBalance = referenceNode.getBalance();
-
-                            if (referenceBalance == 0) {
-                                referenceNode.getLeftNode().setBalance(0);
-                                referenceNode.getRigthNode().setBalance(0);
-                            } else if (referenceBalance == -1) {
-                                referenceNode.getLeftNode().setBalance(0);
-                                referenceNode.getRigthNode().setBalance(1);
-                            } else {
-                                referenceNode.getLeftNode().setBalance(-1);
-                                referenceNode.getRigthNode().setBalance(0);
-                            }
-                        }
-                        referenceNode.setBalance(0);
-                        height.setIncreaseHeight(false);
-                    }
-                }
-            }
-        } else {
-            referenceNode.setRightNode(addNode(key, referenceNode.getRigthNode(), height));
-
-            if (height.getIncreaseHeight()) {
-                switch (referenceNode.getBalance()) {
-                    case -1 -> {
-                        referenceNode.setBalance(0);
-                        height.setIncreaseHeight(false);
-                    }
-                    case 0 -> {
-                        referenceNode.setBalance(1);
-                        height.setIncreaseHeight(true);
-                    }
-                    case 1 -> {
-                        final Integer rightBalance = referenceNode.getRigthNode().getBalance();
-                        if (rightBalance == 1) {
-                            referenceNode = leftRotate(referenceNode);
-                            final Node leftNode = referenceNode.getLeftNode();
-                            leftNode.setBalance(0);
-                        } else {
-                            referenceNode.setRightNode(rightRotate(referenceNode.getRigthNode()));
-                            referenceNode = leftRotate(referenceNode);
-
-                            final Integer referenceBalance = referenceNode.getBalance();
-
-                            if (referenceBalance == 0) {
-                                referenceNode.getLeftNode().setBalance(0);
-                                referenceNode.getRigthNode().setBalance(0);
-                            } else if (referenceBalance == 1) {
-                                referenceNode.getRigthNode().setBalance(0);
-                                referenceNode.getLeftNode().setBalance(-1);
-                            } else {
-                                referenceNode.getRigthNode().setBalance(1);
-                                referenceNode.getLeftNode().setBalance(0);
-                            }
-
-                            referenceNode.setBalance(0);
-                            height.setIncreaseHeight(false);
-                        }
-                    }
-                }
-            }
+        if (key < referenceNode.getKey()) {
+            referenceNode.setLeftNode(addNode(key, referenceNode.getLeftNode()));
+        } else if (key > referenceNode.getKey()) {
+            referenceNode.setRightNode(addNode(key, referenceNode.getRigthNode()));
         }
 
-        return referenceNode;
+        referenceNode.setHeight();
+        return balanceNode(referenceNode);
     }
 
     private Node leftRotate(Node node) {
@@ -189,6 +123,40 @@ class AVLTree {
         return auxiliaryNode;
     }
 
+    private Node doubleLeftRotate(Node node) {
+        node.setRightNode(rightRotate(node.getRigthNode()));
+        return leftRotate(node);
+    }
+
+    private Node doubleRightRotate(Node node) {
+        node.setLeftNode(leftRotate(node.getLeftNode()));
+        return rightRotate(node);
+    }
+
+    private Node balanceNode(Node node) {
+        final Integer nodeBalance = Node.getBalance(node);
+        final Integer leftBalance = Node.getBalance(node.getLeftNode());
+        final Integer rightBalance = Node.getBalance(node.getRigthNode());
+
+        if (nodeBalance < -1 && rightBalance <= 0) {
+            return leftRotate(node);
+        }
+
+        if (nodeBalance > 1 && leftBalance >= 0) {
+            return rightRotate(node);
+        }
+
+        if (nodeBalance > 1) {
+            return doubleRightRotate(node);
+        }
+
+        if (nodeBalance < -1) {
+            return doubleLeftRotate(node);
+        }
+
+        return node;
+    }
+
     private void printNode(Node node) {
         if (node != null) {
             printNode(node.getLeftNode());
@@ -199,21 +167,5 @@ class AVLTree {
 
     public void printTree() {
         printNode(firstNode);
-    }
-}
-
-class Height {
-    private Boolean increaseHeight;
-
-    public Height() {
-        this.increaseHeight = false;
-    }
-
-    public Boolean getIncreaseHeight() {
-        return increaseHeight;
-    }
-
-    public void setIncreaseHeight(Boolean increaseHeight) {
-        this.increaseHeight = increaseHeight;
     }
 }
