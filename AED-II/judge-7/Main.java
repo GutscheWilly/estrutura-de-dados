@@ -31,13 +31,12 @@ public class Main {
     }
 
     private static void addOrRemoveKey(Integer key, AVLTree avlTree) {
-        final Node nodeFound = avlTree.searchNode(key);
-
-        if (nodeFound == null) {
-            avlTree.add(key);
-            return;
+        try {
+            avlTree.remove(key);
         }
-        avlTree.remove(key);
+        catch (KeyNotExistsException keyNotExistsException) {
+            avlTree.add(key);
+        }
     }
 
     private static void handleSearchKeys(List<Integer> keys, AVLTree avlTree) {
@@ -207,7 +206,7 @@ class AVLTree {
 
     private Node removeNode(Integer key, Node referenceNode) {
         if (referenceNode == null) {
-            return null;
+            throw new KeyNotExistsException();
         }
 
         final int referenceKey = referenceNode.getKey();
@@ -293,5 +292,11 @@ class AVLTree {
             return;
         }
         printHeight(foundNode);
+    }
+}
+
+class KeyNotExistsException extends RuntimeException {
+    public KeyNotExistsException() {
+        super("Key not exists!");
     }
 }
