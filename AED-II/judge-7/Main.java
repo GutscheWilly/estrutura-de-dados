@@ -7,13 +7,21 @@ public class Main {
         final List<Integer> keys = inputKeys();
 
         final AVLTree avlTree = new AVLTree(keys);
+        avlTree.printHeights();
 
+        System.out.println();
+        avlTree.printTree();
+
+        final List<Integer> searchKeys = inputKeys();
+        handleSearchKeys(searchKeys, avlTree);
+
+        System.out.println();
         avlTree.printHeights();
     }
 
     private static final Scanner scanner = new Scanner(System.in);
 
-    public static List<Integer> inputKeys() {
+    private static List<Integer> inputKeys() {
         final List<Integer> keys = new ArrayList<>();
         int key = scanner.nextInt();
 
@@ -22,6 +30,24 @@ public class Main {
             key = scanner.nextInt();
         }
         return keys;
+    }
+
+    private static void addOrRemoveKey(Integer key, AVLTree avlTree) {
+        final Node nodeFound = avlTree.searchNode(key);
+
+        if (nodeFound == null) {
+            avlTree.add(key);
+            return;
+        }
+        avlTree.remove(key);
+    }
+
+    private static void handleSearchKeys(List<Integer> keys, AVLTree avlTree) {
+        keys.forEach(key -> {
+                addOrRemoveKey(key, avlTree);
+                System.out.println();
+                avlTree.printTree();
+        });
     }
 }
 
@@ -198,17 +224,17 @@ class AVLTree {
             }
 
             if (leftNode != null && rightNode != null) {
-                Node auxiliary = referenceNode.getLeftNode();
+                Node auxiliary = referenceNode.getRigthNode();
 
-                while (auxiliary.getRigthNode() != null) {
-                    auxiliary = auxiliary.getRigthNode();
+                while (auxiliary.getLeftNode() != null) {
+                    auxiliary = auxiliary.getLeftNode();
                 }
 
                 referenceNode.setKey(auxiliary.getKey());
                 auxiliary.setKey(key);
 
-                referenceNode.setLeftNode(removeNode(key, leftNode));
-                return referenceNode;
+                referenceNode.setRightNode(removeNode(key, rightNode));
+                return balanceNode(referenceNode);
             }
 
             return leftNode != null ? leftNode : rightNode;
@@ -239,14 +265,38 @@ class AVLTree {
 
     public void printTree() {
         printNode(firstNode);
-        System.out.println();
     }
 
     public void printHeights() {
-        final Integer firstNodeHeight = Node.getHeight(firstNode);
-        final Integer leftHeight = Node.getHeight(firstNode.getLeftNode()) + 1;
-        final Integer rightHeight = Node.getHeight(firstNode.getRigthNode()) + 1;
+        printHeight(firstNode);
+    }
+
+    public static void printHeight(Node node) {
+        final Integer firstNodeHeight = Node.getHeight(node);
+        final Integer leftHeight = Node.getHeight(node.getLeftNode()) + 1;
+        final Integer rightHeight = Node.getHeight(node.getRigthNode()) + 1;
 
         System.out.print(firstNodeHeight + ", " + leftHeight + ", " + rightHeight);
+    }
+
+    private Node searchNode(int key, Node referenceNode) {
+        if (referenceNode == null) {
+            return null;
+        }
+
+        final int referenceKey = referenceNode.getKey();
+
+        if (key == referenceKey) {
+            return referenceNode;
+        }
+
+        if (key < referenceKey) {
+            return searchNode(key, referenceNode.getLeftNode());
+        }
+        return searchNode(key, referenceNode.getRigthNode());
+    }
+
+    public Node searchNode(Integer key) {
+        return searchNode(key, firstNode);
     }
 }
