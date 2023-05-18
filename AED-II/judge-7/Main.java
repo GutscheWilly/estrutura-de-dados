@@ -1,16 +1,32 @@
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        List<Integer> keys = Arrays.asList(6, 4, 3, 2, 1);
-        AVLTree avlTree = new AVLTree(keys);
-        avlTree.printTree();
+        final List<Integer> keys = inputKeys();
+
+        final AVLTree avlTree = new AVLTree(keys);
+
+        avlTree.printHeights();
+    }
+
+    private static final Scanner scanner = new Scanner(System.in);
+
+    public static List<Integer> inputKeys() {
+        final List<Integer> keys = new ArrayList<>();
+        int key = scanner.nextInt();
+
+        while (key > -1) {
+            keys.add(key);
+            key = scanner.nextInt();
+        }
+        return keys;
     }
 }
 
 class Node {
-    private final Integer key;
+    private Integer key;
     private Node leftNode;
     private Node rigthNode;
     private Integer height;
@@ -48,6 +64,10 @@ class Node {
         return getHeight(node.getLeftNode()) - getHeight(node.getRigthNode());
     }
 
+    public void setKey(Integer key) {
+        this.key = key;
+    }
+
     public void setLeftNode(Node node) {
         leftNode = node;
     }
@@ -76,14 +96,11 @@ class AVLTree {
     }
 
     private void setFirstNode(Node node) {
-        firstNode = node;
+        this.firstNode = node;
     }
 
     private void createAVLTree(List<Integer> keys) {
-        keys.forEach( key -> {
-            final Node firstNodeAdded = addNode(key, firstNode);
-            setFirstNode(firstNodeAdded);
-        });
+        keys.forEach( this::add );
     }
 
     private Node addNode(Integer key, Node referenceNode) {
@@ -99,6 +116,11 @@ class AVLTree {
 
         referenceNode.setHeight();
         return balanceNode(referenceNode);
+    }
+
+    public void add(Integer key) {
+        final Node firstNodeAdded = addNode(key, firstNode);
+        setFirstNode(firstNodeAdded);
     }
 
     private Node leftRotate(Node node) {
@@ -161,6 +183,52 @@ class AVLTree {
         return node;
     }
 
+    private Node removeNode(Integer key, Node referenceNode) {
+        if (referenceNode == null) {
+            return null;
+        }
+
+        final int referenceKey = referenceNode.getKey();
+        final Node leftNode = referenceNode.getLeftNode();
+        final Node rightNode = referenceNode.getRigthNode();
+
+        if (key == referenceKey) {
+            if (leftNode == null && rightNode == null) {
+                return null;
+            }
+
+            if (leftNode != null && rightNode != null) {
+                Node auxiliary = referenceNode.getLeftNode();
+
+                while (auxiliary.getRigthNode() != null) {
+                    auxiliary = auxiliary.getRigthNode();
+                }
+
+                referenceNode.setKey(auxiliary.getKey());
+                auxiliary.setKey(key);
+
+                referenceNode.setLeftNode(removeNode(key, leftNode));
+                return referenceNode;
+            }
+
+            return leftNode != null ? leftNode : rightNode;
+        }
+
+        if (key < referenceKey) {
+            referenceNode.setLeftNode(removeNode(key, leftNode));
+        } else {
+            referenceNode.setRightNode(removeNode(key, rightNode));
+        }
+
+        referenceNode.setHeight();
+        return balanceNode(referenceNode);
+    }
+
+    public void remove(Integer key) {
+        final Node fistNodeRemoved = removeNode(key, firstNode);
+        setFirstNode(fistNodeRemoved);
+    }
+
     private void printNode(Node node) {
         if (node != null) {
             System.out.print(node.getKey() + "(" + Node.getHeight(node) + ") ");
@@ -171,5 +239,14 @@ class AVLTree {
 
     public void printTree() {
         printNode(firstNode);
+        System.out.println();
+    }
+
+    public void printHeights() {
+        final Integer firstNodeHeight = Node.getHeight(firstNode);
+        final Integer leftHeight = Node.getHeight(firstNode.getLeftNode()) + 1;
+        final Integer rightHeight = Node.getHeight(firstNode.getRigthNode()) + 1;
+
+        System.out.print(firstNodeHeight + ", " + leftHeight + ", " + rightHeight);
     }
 }
