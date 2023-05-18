@@ -9,14 +9,12 @@ public class Main {
         final AVLTree avlTree = new AVLTree(keys);
         avlTree.printHeights();
 
-        System.out.println();
-        avlTree.printTree();
-
         final List<Integer> searchKeys = inputKeys();
         handleSearchKeys(searchKeys, avlTree);
 
+        final Integer lastSearchKey = scanner.nextInt();
         System.out.println();
-        avlTree.printHeights();
+        avlTree.searchKey(lastSearchKey);
     }
 
     private static final Scanner scanner = new Scanner(System.in);
@@ -43,11 +41,9 @@ public class Main {
     }
 
     private static void handleSearchKeys(List<Integer> keys, AVLTree avlTree) {
-        keys.forEach(key -> {
-                addOrRemoveKey(key, avlTree);
-                System.out.println();
-                avlTree.printTree();
-        });
+        keys.forEach(key ->
+                addOrRemoveKey(key, avlTree)
+        );
     }
 }
 
@@ -234,6 +230,7 @@ class AVLTree {
                 auxiliary.setKey(key);
 
                 referenceNode.setRightNode(removeNode(key, rightNode));
+                referenceNode.setHeight();
                 return balanceNode(referenceNode);
             }
 
@@ -255,23 +252,11 @@ class AVLTree {
         setFirstNode(fistNodeRemoved);
     }
 
-    private void printNode(Node node) {
-        if (node != null) {
-            System.out.print(node.getKey() + "(" + Node.getHeight(node) + ") ");
-            printNode(node.getLeftNode());
-            printNode(node.getRigthNode());
-        }
-    }
-
-    public void printTree() {
-        printNode(firstNode);
-    }
-
     public void printHeights() {
         printHeight(firstNode);
     }
 
-    public static void printHeight(Node node) {
+    public void printHeight(Node node) {
         final Integer firstNodeHeight = Node.getHeight(node);
         final Integer leftHeight = Node.getHeight(node.getLeftNode()) + 1;
         final Integer rightHeight = Node.getHeight(node.getRigthNode()) + 1;
@@ -298,5 +283,15 @@ class AVLTree {
 
     public Node searchNode(Integer key) {
         return searchNode(key, firstNode);
+    }
+
+    public void searchKey(Integer key) {
+        final Node foundNode = searchNode(key);
+
+        if (foundNode == null) {
+            System.out.print("Valor nao encontrado");
+            return;
+        }
+        printHeight(foundNode);
     }
 }
