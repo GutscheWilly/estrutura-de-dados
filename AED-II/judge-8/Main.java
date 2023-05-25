@@ -1,6 +1,25 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
+        final List<Integer> keys = inputKeys();
+        RedBlackTree redBlackTree = new RedBlackTree(keys);
+        redBlackTree.print();
+    }
 
+    private static final Scanner scanner = new Scanner(System.in);
+
+    private static List<Integer> inputKeys() {
+        final List<Integer> keys = new ArrayList<>();
+        int key = scanner.nextInt();
+
+        while (key > -1) {
+            keys.add(key);
+            key = scanner.nextInt();
+        }
+        return keys;
     }
 }
 
@@ -30,8 +49,13 @@ class RedBlackTree {
     public Node root;
     public static Node nil = new Node(-1, false);
 
-    public RedBlackTree() {
+    public RedBlackTree(List<Integer> keys) {
         this.root = RedBlackTree.nil;
+        createTree(keys);
+    }
+
+    private void createTree(List<Integer> keys) {
+        keys.forEach(this::add);
     }
 
     private void leftRotate(Node x) {
