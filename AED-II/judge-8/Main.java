@@ -10,7 +10,7 @@ public class Main {
         System.out.println();
         RedBlackNode.printHeight(redBlackTree.root);
         System.out.println();
-        System.out.println(redBlackTree.blackHeight());
+        System.out.println(redBlackTree.colorChanges);
     }
 
     private static final Scanner scanner = new Scanner(System.in);
@@ -82,9 +82,13 @@ class RedBlackNode {
 class RedBlackTree {
     public RedBlackNode root;
     public static RedBlackNode nil = new RedBlackNode(-1, false);
+    public Integer rotations;
+    public Integer colorChanges;
 
     public RedBlackTree(List<Integer> keys) {
         this.root = RedBlackTree.nil;
+        rotations = 0;
+        colorChanges = 0;
         createTree(keys);
         updateHeights();
     }
@@ -113,6 +117,8 @@ class RedBlackTree {
 
         y.left = x;
         x.father = y;
+
+        rotations++;
     }
 
     private void rightRotate(RedBlackNode x) {
@@ -134,6 +140,8 @@ class RedBlackTree {
 
         y.right = x;
         x.father = y;
+
+        rotations++;
     }
 
     public void add(int n) {
@@ -165,6 +173,7 @@ class RedBlackTree {
                     z.father.isRed = false;
                     y.isRed = false;
                     z.father.father.isRed = true;
+                    colorChanges += 3;
                     z = z.father.father;
                 } else {
                     if (z == z.father.right) {
@@ -174,6 +183,7 @@ class RedBlackTree {
 
                     z.father.isRed = false;
                     z.father.father.isRed = true;
+                    colorChanges += 2;
                     this.rightRotate(z.father.father);
                 }
             } else {
@@ -182,6 +192,7 @@ class RedBlackTree {
                 if (y.isRed) {
                     y.isRed = z.father.isRed = false;
                     z.father.father.isRed = true;
+                    colorChanges += 3;
                     z = z.father.father;
                 }	else {
                     if (z == z.father.left) {
@@ -191,6 +202,7 @@ class RedBlackTree {
 
                     z.father.isRed = false;
                     z.father.father.isRed = true;
+                    colorChanges += 2;
                     this.leftRotate(z.father.father);
                 }
             }
