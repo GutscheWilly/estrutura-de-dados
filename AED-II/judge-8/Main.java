@@ -9,6 +9,8 @@ public class Main {
         redBlackTree.print();
         System.out.println();
         RedBlackNode.printHeight(redBlackTree.root);
+        System.out.println();
+        System.out.println(redBlackTree.blackHeight());
     }
 
     private static final Scanner scanner = new Scanner(System.in);
@@ -28,7 +30,7 @@ public class Main {
 class RedBlackNode {
     public Integer key;
     public RedBlackNode father, left, right;
-    public boolean isRed;
+    public Boolean isRed;
     public Integer height;
 
     public RedBlackNode(int key, boolean isRed) {
@@ -216,5 +218,18 @@ class RedBlackTree {
         root.updateHeight();
         root.left.updateHeight();
         root.right.updateHeight();
+    }
+
+    public Integer blackHeight() {
+        RedBlackNode node = root;
+        int blackHeight = 0;
+
+        while (node != nil) {
+            if (!node.isRed) {
+                blackHeight++;
+            }
+            node = node.left;
+        }
+        return blackHeight;
     }
 }
