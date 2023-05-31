@@ -6,17 +6,17 @@ public class Main {
     public static void main(String[] args) {
         final List<Integer> keys = inputKeys();
 
-        AVLTree avlTree = new AVLTree(keys);
+        final AVLTree avlTree = new AVLTree(keys);
         avlTree.printHeights();
         System.out.println();
 
-        RedBlackTree redBlackTree = new RedBlackTree(keys);
+        final RedBlackTree redBlackTree = new RedBlackTree(keys);
         RedBlackNode.printHeight(redBlackTree.root);
         System.out.println();
 
         System.out.println(redBlackTree.blackHeight());
 
-        System.out.println(redBlackTree.colorChanges + ", " + redBlackTree.rotations + ", " + avlTree.rotations);
+        System.out.print(redBlackTree.colorChanges + ", " + redBlackTree.rotations + ", " + avlTree.rotations);
     }
 
     private static final Scanner scanner = new Scanner(System.in);
@@ -218,18 +218,6 @@ class RedBlackTree {
 
     public RedBlackNode find(int n) {
         return this.root.findNode(n);
-    }
-
-    private void print(RedBlackNode node) {
-        if (node != null && node != nil) {
-            System.out.print(node.key + "(" + node.isRed + ") ");
-            print(node.left);
-            print(node.right);
-        }
-    }
-
-    public void print() {
-        print(root);
     }
 
     private void updateHeights() {
