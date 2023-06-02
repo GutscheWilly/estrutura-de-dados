@@ -83,29 +83,34 @@ class Hash {
         keys.set(key, value);
     }
 
-    public int contains(int value) {
+    public boolean contains(int value) {
         int key = hashFunction(value);
 
         for (int collision = 1; isKeyNotEmpty(key); collision++) {
             final int currentValue = keys.get(key);
 
             if (currentValue == value) {
-                return key;
+                return true;
             }
 
             key = doubleHashFunction(value, collision);
         }
-        return emptyValue;
+        return false;
     }
 
     public void remove(int value) {
-        final int key = contains(value);
-
-        if (key == emptyValue) {
+        if (!contains(value)) {
             System.out.println("Valor nao encontrado");
             return;
         }
-        keys.set(key, removedValue);
+
+        for (int i = 0; i < keys.size(); i++) {
+            final int currentValue = keys.get(i);
+
+            if (currentValue == value) {
+                keys.set(i, removedValue);
+            }
+        }
     }
 
     public void print() {
