@@ -1,11 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
-#define M 2
-#define MM (M * 2) // Ordem -1
+
 #define FALSE 0
 #define TRUE 1
+#define TAM 1000
 
-typedef long TipoChave;
+int M;
+int MM;
+
+typedef int TipoChave;
 
 typedef struct TipoRegistro
 {
@@ -16,9 +19,9 @@ typedef struct TipoPagina *TipoApontador;
 
 typedef struct TipoPagina
 {
-	short n;
-	TipoRegistro r[MM];
-	TipoApontador p[MM + 1];
+	int n;
+	TipoRegistro r[TAM];
+	TipoApontador p[TAM];
 } TipoPagina;
 
 void Inicializa(TipoApontador *Dicionario)
@@ -26,8 +29,7 @@ void Inicializa(TipoApontador *Dicionario)
 	*Dicionario = NULL;
 }
 
-void InsereNaPagina(TipoApontador Ap,
-					TipoRegistro Reg, TipoApontador ApDir)
+void InsereNaPagina(TipoApontador Ap, TipoRegistro Reg, TipoApontador ApDir)
 {
 	short NaoAchouPosicao;
 	int k;
@@ -51,8 +53,7 @@ void InsereNaPagina(TipoApontador Ap,
 	Ap->n++;
 }
 
-void Ins(TipoRegistro Reg, TipoApontador Ap, short *Cresceu,
-		 TipoRegistro *RegRetorno, TipoApontador *ApRetorno)
+void Ins(TipoRegistro Reg, TipoApontador Ap, short *Cresceu, TipoRegistro *RegRetorno, TipoApontador *ApRetorno)
 {
 	long i = 1; // Posição provavel do vetor em que novo indice sera inserido
 	long j;
@@ -128,42 +129,22 @@ void Insere(TipoRegistro Reg, TipoApontador *Ap)
 	}
 }
 
-void ImprimeI(TipoApontador p, int nivel)
-{
-	long i;
-	if (p == NULL)
-		return;
-	printf("Nivel %d : ", nivel);
-	for (i = 0; i < p->n; i++)
-		printf("%ld ", (long)p->r[i].Chave);
-	putchar('\n');
-	nivel++;
-	for (i = 0; i <= p->n; i++)
-		ImprimeI(p->p[i], nivel);
-}
-
-void Imprime(TipoApontador p)
-{
-	int n = 0;
-	ImprimeI(p, n);
-}
-
 void pegarInputs(TipoPagina **pagina)
 {
 	TipoRegistro registro;
-	long input;
-	scanf("%ld", &input);
+	int input;
+	scanf("%d", &input);
 	registro.Chave = input;
 
 	while (input >= 0)
 	{
 		Insere(registro, pagina);
-		scanf("%ld", &input);
+		scanf("%d", &input);
 		registro.Chave = input;
 	}
 }
 
-TipoApontador search(TipoApontador pagina, int dado)
+TipoApontador buscar(TipoApontador pagina, int dado)
 {
 	if (pagina != NULL)
 	{
@@ -178,7 +159,7 @@ TipoApontador search(TipoApontador pagina, int dado)
 		}
 		else if (pagina->p[i] != NULL)
 		{
-			return search(pagina->p[i], dado);
+			return buscar(pagina->p[i], dado);
 		}
 		else
 			return NULL; 
@@ -187,27 +168,35 @@ TipoApontador search(TipoApontador pagina, int dado)
 		return NULL; 
 }
 
-void imprimirPagina(TipoApontador pagina) {
+void imprimirPagina(TipoApontador pagina) 
+{
 	for (int i = 0; i < pagina->n; i++) {
-		printf("%ld ", pagina->r[i].Chave);
+		printf("%d ", pagina->r[i].Chave);
 	}
 }
 
 int main()
 {
-	int ordem;
-	scanf("%d", &ordem);
+	scanf("%d", &M);
+	MM = M * 2;
 
 	TipoPagina *pagina = NULL;
-
 	Inicializa(&pagina);
-
 	pegarInputs(&pagina);
 
-	Imprime(pagina);
+	int chaveBusca;
+	scanf("%d", &chaveBusca);
 
-	TipoApontador teste = search(pagina, 55);
-	imprimirPagina(teste);
+	TipoApontador paginaBuscada = buscar(pagina, chaveBusca);
+
+	printf("%d\n", pagina->n);
+
+	if (paginaBuscada == NULL) {
+		printf("Valor nao encontrado");
+	} else {
+		printf("%d\n", paginaBuscada->n);
+		imprimirPagina(paginaBuscada);
+	}
 
 	return 0;
 }
