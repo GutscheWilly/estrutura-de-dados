@@ -8,157 +8,141 @@
 int M;
 int MM;
 
-typedef int TipoChave;
+typedef int Dado;
 
-typedef struct TipoRegistro
-{
-	TipoChave Chave;
-} TipoRegistro;
+typedef struct {
+	Dado chave;
+} Registro;
 
-typedef struct TipoPagina *TipoApontador;
+typedef struct Pagina* ApontadorPagina;
 
-typedef struct TipoPagina
-{
+typedef struct Pagina {
 	int n;
-	TipoRegistro r[TAM];
-	TipoApontador p[TAM];
-} TipoPagina;
+	Registro r[TAM];
+	ApontadorPagina p[TAM];
+} Pagina;
 
-void Inicializa(TipoApontador *Dicionario)
-{
-	*Dicionario = NULL;
+void inicializar(ApontadorPagina *apontadorPagina) {
+	*apontadorPagina = NULL;
 }
 
-void InsereNaPagina(TipoApontador Ap, TipoRegistro Reg, TipoApontador ApDir)
-{
-	short NaoAchouPosicao;
-	int k;
-	k = Ap->n;
-	NaoAchouPosicao = (k > 0);
-	while (NaoAchouPosicao)
-	{
-		if (Reg.Chave >= Ap->r[k - 1].Chave)
-		{
-			NaoAchouPosicao = FALSE;
+void insereNaPagina(ApontadorPagina apontadorPagina, Registro registro, ApontadorPagina apontadorDireita) {
+	int k = apontadorPagina->n;
+	int naoAchouPosicao = (k > 0);
+
+	while (naoAchouPosicao) {
+		if (registro.chave >= apontadorPagina->r[k - 1].chave) {
+			naoAchouPosicao = FALSE;
 			break;
 		}
-		Ap->r[k] = Ap->r[k - 1];
-		Ap->p[k + 1] = Ap->p[k];
+
+		apontadorPagina->r[k] = apontadorPagina->r[k - 1];
+		apontadorPagina->p[k + 1] = apontadorPagina->p[k];
 		k--;
+
 		if (k < 1)
-			NaoAchouPosicao = FALSE;
+			naoAchouPosicao = FALSE;
 	}
-	Ap->r[k] = Reg;
-	Ap->p[k + 1] = ApDir;
-	Ap->n++;
+
+	apontadorPagina->r[k] = registro;
+	apontadorPagina->p[k + 1] = apontadorDireita;
+	apontadorPagina->n++;
 }
 
-void Ins(TipoRegistro Reg, TipoApontador Ap, short *Cresceu, TipoRegistro *RegRetorno, TipoApontador *ApRetorno)
-{
-	long i = 1; // Posição provavel do vetor em que novo indice sera inserido
-	long j;
-	TipoApontador ApTemp;
+void Ins(Registro registro, ApontadorPagina apontadorPagina, int* aumentou, Registro* RegRetorno, ApontadorPagina* apontadorRetorno) {
+	int i = 1; // Posição provavel do vetor em que novo indice sera inserido
+	int j;
+	ApontadorPagina apontadorAux;
 
-	if (Ap == NULL) // Critério de parada da recursão. Pode ser usado para arvore vazia, arvore com espaço em folhas ou arvore que explode
-	{
-		*Cresceu = TRUE;
-		(*RegRetorno) = Reg;
-		(*ApRetorno) = NULL;
+	if (apontadorPagina == NULL) { // Critério de parada da recursão. Pode ser usado para arvore vazia, arvore com espaço em folhas ou arvore que explode
+		*aumentou = TRUE;
+		(*RegRetorno) = registro;
+		(*apontadorRetorno) = NULL;
 		return;
 	}
 
-	while (i < Ap->n && Reg.Chave > Ap->r[i - 1].Chave)
+	while (i < apontadorPagina->n && registro.chave > apontadorPagina->r[i - 1].chave)
 		i++; // Percorrendo vetores dos nós para encontrar valor maior (ou igual) que o novo indice
 
-	if (Reg.Chave == Ap->r[i - 1].Chave)
-	{
-		printf(" Erro: Registro ja esta presente\n");
-		*Cresceu = FALSE;
+	if (registro.chave == apontadorPagina->r[i - 1].chave) {
+		*aumentou = FALSE;
 		return;
 	}
 
-	if (Reg.Chave < Ap->r[i - 1].Chave)
+	if (registro.chave < apontadorPagina->r[i - 1].chave)
 		i--; // Como o valor nao é igual, só pode ser maior, entao volta-se uma posição
 
-	Ins(Reg, Ap->p[i], Cresceu, RegRetorno, ApRetorno); // Chama-se recursivo para descer na arvore
+	Ins(registro, apontadorPagina->p[i], aumentou, RegRetorno, apontadorRetorno); // Chama-se recursivo para descer na arvore
 
-	if (!*Cresceu)
+	if (!*aumentou)
 		return;
 
-	if (Ap->n < MM) /* Pagina tem espaco */
-	{
-		InsereNaPagina(Ap, *RegRetorno, *ApRetorno); // Chama insere na página pq tem esoaço
-		*Cresceu = FALSE;
+	if (apontadorPagina->n < MM) { /* Pagina tem espaco */
+		insereNaPagina(apontadorPagina, *RegRetorno, *apontadorRetorno); // Chama insere na página pq tem esoaço
+		*aumentou = FALSE;
 		return;
 	}
 
 	/* Overflow: Pagina tem que ser dividida */			// Página nao tem espaço suficiente
-	ApTemp = (TipoApontador)malloc(sizeof(TipoPagina)); // Cria nova pagina pra ser raiz da subarvore que vem do split
-	ApTemp->n = 0;
-	ApTemp->p[0] = NULL; // Ela começa com zero indices e primeiro filho pra NULL
-	if (i < M + 1)
-	{
-		InsereNaPagina(ApTemp, Ap->r[MM - 1], Ap->p[MM]);
-		Ap->n--;
-		InsereNaPagina(Ap, *RegRetorno, *ApRetorno);
-	}
-	else
-		InsereNaPagina(ApTemp, *RegRetorno, *ApRetorno);
+	apontadorAux = (ApontadorPagina)malloc(sizeof(Pagina)); // Cria nova pagina pra ser raiz da subarvore que vem do split
+	apontadorAux->n = 0;
+	apontadorAux->p[0] = NULL; // Ela começa com zero indices e primeiro filho pra NULL
+
+	if (i < M + 1) {
+		insereNaPagina(apontadorAux, apontadorPagina->r[MM - 1], apontadorPagina->p[MM]);
+		apontadorPagina->n--;
+		insereNaPagina(apontadorPagina, *RegRetorno, *apontadorRetorno);
+	} else
+		insereNaPagina(apontadorAux, *RegRetorno, *apontadorRetorno);
+
 	for (j = M + 2; j <= MM; j++)
-		InsereNaPagina(ApTemp, Ap->r[j - 1], Ap->p[j]);
-	Ap->n = M;
-	ApTemp->p[0] = Ap->p[M + 1];
-	*RegRetorno = Ap->r[M];
-	*ApRetorno = ApTemp;
+		insereNaPagina(apontadorAux, apontadorPagina->r[j - 1], apontadorPagina->p[j]);
+
+	apontadorPagina->n = M;
+	apontadorAux->p[0] = apontadorPagina->p[M + 1];
+	*RegRetorno = apontadorPagina->r[M];
+	*apontadorRetorno = apontadorAux;
 }
 
-void Insere(TipoRegistro Reg, TipoApontador *Ap)
-{
-	short Cresceu;
-	TipoRegistro RegRetorno;
-	TipoPagina *ApRetorno, *ApTemp;
-	Ins(Reg, *Ap, &Cresceu, &RegRetorno, &ApRetorno); // Chamando funcao insere auxiliar
-	if (Cresceu)									  /* Arvore cresce na altura pela raiz */
-	{
-		ApTemp = (TipoPagina *)malloc(sizeof(TipoPagina)); // Criando nova raiz
-		ApTemp->n = 1;									   // Definindo que a nova raiz só terá um índice
-		ApTemp->r[0] = RegRetorno;						   // Definindo valor do unico indice da raiz
-		ApTemp->p[1] = ApRetorno;						   // Definindo filho da direita da raiz, resultado do split que causou explosao no tamanho
-		ApTemp->p[0] = *Ap;								   // Definindo filho da esquerda da raiz, resultado do split que causou explosao no tamanho
-		*Ap = ApTemp;									   // Enderençando nova raiz
+void Insere(Registro registro, ApontadorPagina *apontadorPagina) {
+	int aumentou;
+	Registro RegRetorno;
+	Pagina *apontadorRetorno, *apontadorAux;
+	Ins(registro, *apontadorPagina, &aumentou, &RegRetorno, &apontadorRetorno); // Chamando funcao insere auxiliar
+
+	if (aumentou) { /* Arvore cresce na altura pela raiz */
+		apontadorAux = (Pagina *)malloc(sizeof(Pagina)); // Criando nova raiz
+		apontadorAux->n = 1;									   // Definindo que a nova raiz só terá um índice
+		apontadorAux->r[0] = RegRetorno;						   // Definindo valor do unico indice da raiz
+		apontadorAux->p[1] = apontadorRetorno;						   // Definindo filho da direita da raiz, resultado do split que causou explosao no tamanho
+		apontadorAux->p[0] = *apontadorPagina;								   // Definindo filho da esquerda da raiz, resultado do split que causou explosao no tamanho
+		*apontadorPagina = apontadorAux;									   // Enderençando nova raiz
 	}
 }
 
-void pegarInputs(TipoPagina **pagina)
-{
-	TipoRegistro registro;
+void pegarInputs(Pagina **pagina) {
+	Registro registro;
 	int input;
 	scanf("%d", &input);
-	registro.Chave = input;
+	registro.chave = input;
 
-	while (input >= 0)
-	{
+	while (input >= 0) {
 		Insere(registro, pagina);
 		scanf("%d", &input);
-		registro.Chave = input;
+		registro.chave = input;
 	}
 }
 
-TipoApontador buscar(TipoApontador pagina, int dado)
-{
-	if (pagina != NULL)
-	{
+ApontadorPagina buscar(ApontadorPagina pagina, int dado) {
+	if (pagina != NULL) {
 		int i = 0;
-		while (i < pagina->n && dado > pagina->r[i].Chave)
-		{
+		while (i < pagina->n && dado > pagina->r[i].chave) {
 			i++;
 		}
-		if (i < pagina->n && dado == pagina->r[i].Chave)
-		{
+		if (i < pagina->n && dado == pagina->r[i].chave) {
 			return pagina; 
 		}
-		else if (pagina->p[i] != NULL)
-		{
+		else if (pagina->p[i] != NULL) {
 			return buscar(pagina->p[i], dado);
 		}
 		else
@@ -168,26 +152,24 @@ TipoApontador buscar(TipoApontador pagina, int dado)
 		return NULL; 
 }
 
-void imprimirPagina(TipoApontador pagina) 
-{
+void imprimirPagina(ApontadorPagina pagina) {
 	for (int i = 0; i < pagina->n; i++) {
-		printf("%d ", pagina->r[i].Chave);
+		printf("%d ", pagina->r[i].chave);
 	}
 }
 
-int main()
-{
+int main() {
 	scanf("%d", &M);
 	MM = M * 2;
 
-	TipoPagina *pagina = NULL;
-	Inicializa(&pagina);
+	Pagina *pagina = NULL;
+	inicializar(&pagina);
 	pegarInputs(&pagina);
 
 	int chaveBusca;
 	scanf("%d", &chaveBusca);
 
-	TipoApontador paginaBuscada = buscar(pagina, chaveBusca);
+	ApontadorPagina paginaBuscada = buscar(pagina, chaveBusca);
 
 	printf("%d\n", pagina->n);
 
