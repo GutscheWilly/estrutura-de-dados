@@ -1,7 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 public class Main {
     public static void main(String[] args) {
@@ -20,6 +18,9 @@ public class Main {
 
         System.out.println();
         graph.breadthFirstSearch(0);
+
+        System.out.println();
+        graph.depthSearch(0);
     }
 }
 
@@ -101,6 +102,8 @@ class Graph {
     }
 
     public void breadthFirstSearch(Integer source) {
+        setupColorsToWhite();
+
         Node start = nodes.get(source);
         start.color = Color.GREY;
 
@@ -122,5 +125,36 @@ class Graph {
             node.color = Color.BLACK;
             System.out.print(node.value + " ");
         }
+    }
+
+    private void setupColorsToWhite() {
+        for (Node node : nodes) {
+            node.color = Color.WHITE;
+        }
+    }
+
+    public void depthSearch(Integer source) {
+        setupColorsToWhite();
+
+        for (Node node : nodes) {
+            if (node.color == Color.WHITE) {
+                checkVisit(node);
+            }
+        }
+    }
+
+    private void checkVisit(Node node) {
+        node.color = Color.GREY;
+        System.out.print(node.value + " ");
+
+        for (Node target : node.getAllTargets()) {
+            Node targetNode = nodes.get(target.value);
+
+            if (targetNode.color == Color.WHITE) {
+                checkVisit(targetNode);
+            }
+        }
+
+        node.color = Color.BLACK;
     }
 }
