@@ -1,26 +1,33 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Graph graph = new Graph(8, 8);
+        Integer searchingNode = scanner.nextInt();
 
-        graph.add(0, 1);
-        graph.add(0, 3);
-        graph.add(1, 4);
-        graph.add(1, 5);
-        graph.add(4, 6);
-        graph.add(6, 0);
-        graph.add(5, 2);
-        graph.add(2, 7);
+        Integer vertices = scanner.nextInt();
+        Integer edges = scanner.nextInt();
 
-        graph.print();
+        Graph graph = createGraph(vertices, edges);
 
+        graph.breadthFirstSearch(searchingNode);
         System.out.println();
-        graph.breadthFirstSearch(0);
+        graph.depthSearch(searchingNode);
+    }
 
-        System.out.println();
-        graph.depthSearch(0);
+    private static final Scanner scanner = new Scanner(System.in);
+
+    private static Graph createGraph(Integer vertices, Integer edges) {
+        Graph graph = new Graph(vertices, edges);
+
+        for (int i = 0; i < edges; i++) {
+            Integer source = scanner.nextInt();
+            Integer target = scanner.nextInt();
+            graph.add(source, target);
+        }
+
+        return graph;
     }
 }
 
@@ -135,12 +142,7 @@ class Graph {
 
     public void depthSearch(Integer source) {
         setupColorsToWhite();
-
-        for (Node node : nodes) {
-            if (node.color == Color.WHITE) {
-                checkVisit(node);
-            }
-        }
+        checkVisit(nodes.get(source));
     }
 
     private void checkVisit(Node node) {
